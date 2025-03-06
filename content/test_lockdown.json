@@ -1,0 +1,53 @@
+{
+  "id": "lockdown",
+  "blocks": [
+    {
+      "id": "proc_cmdline",
+      "probe": {
+        "file": {
+          "paths": ["/proc/cmdline"]
+        }
+      },
+      "wrapper": {
+        "cmd-line": {}
+      }
+    },
+    {
+      "id": "lib_modules_config",
+      "probe": {
+        "file": {
+          "paths": ["/lib/modules/6.13.5-200.fc41.x86_64/config"]
+        }
+      },
+      "wrapper": {
+        "regexp": {
+          "expr": "^(?<key>[^#\\s]+)=\"*(?<val>[^#\\s\"]+)\"*$",
+          "map_key_val": true
+        }
+      }
+    },
+    {
+      "id": "sys_kernel_security",
+      "probe": {
+        "file": {
+          "paths": ["/sys/kernel/security/lockdown"]
+        }
+      },
+      "wrapper": {
+        "regexp": {
+          "expr": "\\[(?<mode>[^\\]]+)\\]",
+          "flags": "M"
+        }
+      }
+    },
+    {
+      "id": "result",
+      "filter": {
+        "cel": {
+          "expr": "lib_modules_config[0].data.has_value_of('CONFIG_LSM', 'lockdown') || sys_kernel_security[0].data.mode != 'none'"
+        }
+      },
+      "src": ["proc_cmdline", "lib_modules_config", "sys_kernel_security"]
+    }
+  ]
+}

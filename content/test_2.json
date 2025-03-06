@@ -1,0 +1,16 @@
+{
+  "id": "lockdown",
+  "blocks": [
+    {
+      "id": "proc_cmdline",
+      "probe": {
+        "file": {
+          "paths": ["/proc/cmdline"]
+        }
+      },
+      "wrapper": {
+        "cmd-line": {}
+      }
+    }
+  ]
+}

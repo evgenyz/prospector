@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cargo build -r
+time target/release/prospector "$@"

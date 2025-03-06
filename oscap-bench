@@ -1,0 +1,3 @@
+#!/bin/sh
+
+time seq 1 1000 | xargs -i -P 16 bash -c 'echo {}; oscapd oval eval' "$@" 2>/dev/null

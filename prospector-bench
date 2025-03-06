@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cargo build -r
+time seq 1 1000 | xargs -i -P 16 bash -c 'echo {}; target/release/prospector' "$@" 2>/dev/null
