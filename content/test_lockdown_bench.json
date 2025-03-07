@@ -1,0 +1,28 @@
+{
+  "id": "lockdown",
+  "blocks": [
+    {
+      "id": "sys_kernel_security",
+      "probe": {
+        "file": {
+          "paths": ["/sys/kernel/security/lockdown"]
+        }
+      },
+      "wrapper": {
+        "regexp": {
+          "expr": "\\[(?<mode>[^\\]]+)\\]",
+          "flags": "M"
+        }
+      }
+    },
+    {
+      "id": "result",
+      "filter": {
+        "cel": {
+          "expr": "sys_kernel_security[0].data.mode != 'none'"
+        }
+      },
+      "src": ["sys_kernel_security"]
+    }
+  ]
+}
