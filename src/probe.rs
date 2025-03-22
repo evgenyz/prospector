@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::block::Runner;
+use crate::runner::Runner;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -37,7 +37,7 @@ impl Runable for FileProbe {
     fn run(&self, runner: &mut Runner) -> Vec<(String, String)> {
         self.paths
             .iter()
-            .map(|path| (path.clone(), runner.cat(&vec![path.clone()])))
+            .map(|path| (path.clone(), runner.cat(&path)))
             .collect()
     }
 }

@@ -1,10 +1,7 @@
-use std::{collections::HashMap, process};
-
 use dependency_graph::{DependencyGraph, Node, Step};
-use simplelog::{info, warn};
-
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Result, Value};
+use simplelog::warn;
 
 use crate::*;
 
@@ -132,88 +129,6 @@ pub struct FilterBlock {
     #[serde(default)]
     src: Vec<String>,
     filter: filter::Filter,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct Fixture {
-    id: String,
-    src: HashMap<String, String>,
-    result: Value,
-}
-
-impl Fixture {
-    pub fn create_from_json(json_string: String) -> Result<Self> {
-        serde_json::from_str(&json_string)
-    }
-
-    pub fn get_cache(&self) -> &HashMap<String, String> {
-        &self.src
-    }
-}
-
-pub struct Runner {
-    cache: HashMap<String, String>,
-    fixture: bool,
-}
-
-impl Runner {
-    pub fn new() -> Self {
-        Runner {
-            cache: Default::default(),
-            fixture: false,
-        }
-    }
-
-    pub fn set_fixture(&mut self, fixture: &HashMap<String, String>) {
-        self.fixture = true;
-        self.cache.clone_from(fixture);
-    }
-
-    pub fn add_value_to_cache(&mut self, k: &str, v: String) {
-        self.cache.insert(k.to_string(), v);
-    }
-
-    pub fn get_value_from_cache(&self, k: &str) -> Option<&String> {
-        self.cache.get(k)
-    }
-
-    pub fn unglob_path(&mut self, path: &str) -> Vec<String> {
-        // TODO: Use shellescape
-        let path_arg = format!("compgen -G '{}'", path);
-        let output = self.run("/usr/bin/bash", &vec!["-c".to_string(), path_arg]);
-        output.lines().map(|l| l.to_string()).collect()
-    }
-
-    pub fn cat(&mut self, paths: &Vec<String>) -> String {
-        self.run("/usr/bin/cat", paths)
-    }
-
-    pub fn run(&mut self, cmd: &str, args: &Vec<String>) -> String {
-        info!("Executing command: {} {:?}", cmd, args);
-        let mut key = String::new();
-        key.push_str(cmd);
-        key.push_str(" ");
-        key.push_str(&args.join(" "));
-
-        let cached_output = self.get_value_from_cache(&key);
-
-        if let Some(output) = cached_output {
-            return output.clone();
-        } else {
-            if self.fixture {
-                panic!("Result for '{}' is not defined in the fixture!", key);
-            } else {
-                let p = process::Command::new(cmd)
-                    .args(args)
-                    .output()
-                    .expect("Can't execute a command!");
-                let raw_output = p.stdout;
-                let output = String::from_utf8(raw_output).expect("Can't decode output!");
-                self.add_value_to_cache(&key, output.clone());
-                output
-            }
-        }
-    }
 }
 
 #[cfg(test)]

@@ -1,11 +1,12 @@
 use simplelog::*;
 
-use block::{Fixture, Runner};
+use runner::Runner;
 use serde_json;
 
 pub mod block;
 pub mod filter;
 pub mod probe;
+pub mod runner;
 pub mod wrapper;
 
 use argh::FromArgs;
@@ -13,13 +14,9 @@ use argh::FromArgs;
 #[derive(FromArgs, Debug)]
 /// Prospector description goes here.
 pub struct Options {
-    /// target runner, optional
+    /// target runner, optional, supported targets: [local://] local runner, default; [fixture:///path/to/fixture.json] mock runner
     #[argh(option, short = 'r')]
     target: Option<String>,
-
-    /// fixture file, optional
-    #[argh(option, short = 'f')]
-    fixture: Option<String>,
 
     /// verbose output, optional
     #[argh(switch, short = 'V')]
@@ -45,13 +42,8 @@ pub fn lib_main(opts: Options) {
 
     info!("Target runner: {:?}", opts.target);
     info!("Inputs: {:?}", opts.inputs);
-    info!("Fixture: {:?}", opts.fixture);
 
-    let mut runner = Runner::new();
-    if let Some(fixture) = opts.fixture {
-        let f = Fixture::create_from_json(std::fs::read_to_string(fixture).unwrap()).unwrap();
-        runner.set_fixture(f.get_cache());
-    }
+    let mut runner = Runner::new_with_target(&opts.target);
     let tests = load_tests(&opts.inputs);
 
     for test in tests {

@@ -1,4 +1,5 @@
 use prospector::block::*;
+use prospector::runner::*;
 use semver::{Version, VersionReq};
 use serde_json::Map;
 

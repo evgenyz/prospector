@@ -4,8 +4,8 @@ use cel_interpreter::{Context, ExecutionError, FunctionContext, Program};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::block::Runner;
 use crate::filter::Executable;
+use crate::runner::Runner;
 
 type Result<T> = std::result::Result<T, ExecutionError>;
 

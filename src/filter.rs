@@ -5,7 +5,7 @@ pub mod cel;
 #[cfg(feature = "rego")]
 pub mod rego;
 
-use crate::block::Runner;
+use crate::runner::Runner;
 
 use crate::filter::cel::CELFilter;
 #[cfg(feature = "rego")]
